@@ -1,17 +1,14 @@
-namespace Nancy
-{
+namespace Nancy {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Net;
 
-    public class Response
-    {
+    public class Response {
         /// <summary>
         /// Initializes a new instance of the <see cref="Response"/> class.
         /// </summary>
-        public Response()
-        {
+        public Response() {
             this.Contents = GetStringContents(string.Empty);
             this.ContentType = "text/html";
             this.Headers = new Dictionary<string, IEnumerable<string>>();
@@ -26,26 +23,25 @@ namespace Nancy
 
         public HttpStatusCode StatusCode { get; set; }
 
-        public static implicit operator Response(HttpStatusCode statusCode)
-        {
+        public static implicit operator Response(HttpStatusCode statusCode) {
             return new Response { StatusCode = statusCode };
         }
 
-        public static implicit operator Response(int statusCode)
-        {
+        public static implicit operator Response(int statusCode) {
             return new Response { StatusCode = (HttpStatusCode)statusCode };
         }
 
-        public static implicit operator Response(string contents)
-        {
+        public static implicit operator Response(string contents) {
             return new Response { Contents = GetStringContents(contents) };
         }
 
-        protected static Action<Stream> GetStringContents(string contents)
-        {
-            return stream =>
-            {
-                var writer = 
+        public static implicit operator Response(Action<Stream> streamFactory) {
+            return new Response { Contents = streamFactory };
+        }
+
+        protected static Action<Stream> GetStringContents(string contents) {
+            return stream => {
+                var writer =
                     new StreamWriter(stream) { AutoFlush = true };
                 writer.Write(contents);
             };
